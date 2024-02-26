@@ -2,7 +2,8 @@ import { Grid, Paper, Typography, IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import useBooks from "./useBook";
+import useBooks, { TBook } from "./useBook";
+import { ChangeEvent } from "react";
 
 const typoStyle = {
   pt: 2,
@@ -11,11 +12,11 @@ const typoStyle = {
 };
 
 export default function BookCard() {
-  const [books] = useBooks();
+  const [books, , deleteBook, addImage] = useBooks();
   return (
     <>
       {books &&
-        books.map((book) => {
+        (books as TBook[]).map((book: TBook) => {
           return (
             <Grid key={book.id} item xs={12} sm={6} md={4}>
               <Paper elevation={2} sx={{ padding: 2 }}>
@@ -51,7 +52,14 @@ export default function BookCard() {
                       type="file"
                       accept="image/*"
                       hidden
-                      onChange={(e) => e.preventDefault()}
+                      onChange={(e) =>
+                        (
+                          addImage as (
+                            e: ChangeEvent<HTMLInputElement>,
+                            book: TBook
+                          ) => void
+                        )(e, book)
+                      }
                     ></input>
                     <AddPhotoAlternateIcon />
                   </IconButton>
@@ -61,6 +69,13 @@ export default function BookCard() {
                     onClick={(e) => e.preventDefault()}
                   >
                     <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    component="button"
+                    color="primary"
+                    onClick={() => (deleteBook as (book: TBook) => void)(book)}
+                  >
+                    <DeleteIcon />
                   </IconButton>
                 </div>
               </Paper>

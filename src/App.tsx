@@ -6,6 +6,7 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { Button, Grid, Container } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import BookCard from "./Books";
+import Form from "./Form";
 
 function App() {
   const [open, setOpen] = useState(false);
@@ -74,6 +75,7 @@ function App() {
           </Grid>
         </Container>
       </main>
+      <Form open={open} handleClose={() => setOpen(false)} />
     </>
   );
 }
