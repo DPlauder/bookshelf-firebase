@@ -9,22 +9,29 @@ import {
   Checkbox,
   DialogContentText,
 } from "@mui/material";
-import { useState } from "react";
+import { ChangeEvent } from "react";
 import useBooks, { TBook } from "./useBook";
 
 interface Props {
   open: boolean;
   handleClose: () => void;
+  formData?: {
+    title: string;
+    author: string;
+    pages: number;
+    read: boolean;
+  };
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Form({ open, handleClose }: Props) {
-  const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    pages: 0,
-    read: false,
-  });
-  const [, addBook] = useBooks();
+export default function Form({
+  open,
+  handleClose,
+  formData,
+  handleChange,
+}: Props) {
+  const [, addBook, , , editBook] = useBooks();
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Add Book</DialogTitle>
@@ -39,8 +46,8 @@ export default function Form({ open, handleClose }: Props) {
           type="text"
           fullWidth
           variant="standard"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          value={formData!.title}
+          onChange={(e) => handleChange(e as ChangeEvent<HTMLInputElement>)}
         />
         <TextField
           required
@@ -51,8 +58,8 @@ export default function Form({ open, handleClose }: Props) {
           type="text"
           fullWidth
           variant="standard"
-          value={formData.author}
-          onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+          value={formData!.author}
+          onChange={(e) => handleChange(e as ChangeEvent<HTMLInputElement>)}
         />
         <TextField
           required
@@ -62,32 +69,26 @@ export default function Form({ open, handleClose }: Props) {
           type="number"
           fullWidth
           variant="standard"
-          value={formData.pages}
-          onChange={(e) =>
-            setFormData({ ...formData, pages: parseInt(e.target.value) })
-          }
+          value={formData!.pages}
+          onChange={(e) => handleChange(e as ChangeEvent<HTMLInputElement>)}
         />
         <FormControlLabel
           control={<Checkbox />}
+          id="read"
           label="Read?"
-          value={formData.read}
-          onChange={() =>
-            setFormData({ ...formData, read: formData.read ? true : false })
-          }
+          value={formData!.read}
+          onChange={(e) => handleChange(e as ChangeEvent<HTMLInputElement>)}
         />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={() => {
-            (addBook as (book: TBook) => Promise<void>)(formData as TBook);
-            setFormData({
-              title: "",
-              author: "",
-              pages: 0,
-              read: false,
-            });
-            handleClose();
+            formData
+              ? (editBook as (book: TBook) => Promise<void>)(formData as TBook)
+              : (addBook as (book: TBook) => Promise<void>)(formData! as TBook);
+
+            //handleClose();
           }}
         >
           Add Book

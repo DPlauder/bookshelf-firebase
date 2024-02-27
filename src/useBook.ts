@@ -44,6 +44,7 @@ export default function useBooks() {
       );
     });
   });
+
   const addBook = async (book: TBook) => {
     const { uid } = auth.currentUser!;
     const docRef = await collection(db, "books");
@@ -51,7 +52,7 @@ export default function useBooks() {
       ...book,
       uid,
       createdAt: new Date(),
-      imgURL: "",
+      imageURL: "",
     });
   };
   const deleteBook = async (book: TBook) => {
@@ -87,5 +88,15 @@ export default function useBooks() {
       console.log(error);
     }
   };
-  return [books, addBook, deleteBook, addImage];
+  const editBook = async (book: TBook) => {
+    try {
+      const docRef = doc(db, "books", book.id);
+      await updateDoc(docRef, {
+        ...book,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return [books, addBook, deleteBook, addImage, editBook];
 }

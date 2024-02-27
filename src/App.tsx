@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { auth } from "./firebase/firebaseInit";
 import SignOutButton from "./firebase/SignOut";
 import SignInButton from "./firebase/SignIn";
@@ -7,10 +7,13 @@ import { Button, Grid, Container } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import BookCard from "./Books";
 import Form from "./Form";
+import useBooks, { TBook } from "./useBook";
 
 function App() {
   const [open, setOpen] = useState(false);
   const [user] = useAuthState(auth);
+  //const [book, setBook] = useState<TBook>();
+  //const [, addBook, , , editBook] = useBooks();
   const header = {
     height: "10vh",
     backgroundColor: "#fff",
@@ -19,6 +22,29 @@ function App() {
     justifyContent: "space-between",
     boxShadow: "2px 2px 3px gray",
     padding: "3px 5%",
+  };
+  const [formData, setFormData] = useState({
+    title: "",
+    author: "",
+    pages: 0,
+    read: false,
+  });
+  const handelChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, type } = event.target;
+    if (id === "title") setFormData({ ...formData, title: event.target.value });
+    if (id === "author")
+      setFormData({ ...formData, author: event.target.value });
+    if (id === "pages")
+      setFormData({ ...formData, pages: parseFloat(event.target.value) });
+    if (type === "checkbox") {
+      setFormData({ ...formData, read: event.target.checked });
+    }
+  };
+
+  const handleEdit = (book: TBook) => {
+    console.log("handleEdit");
+    setFormData({ ...book });
+    setOpen(true);
   };
   return (
     <>
@@ -56,7 +82,7 @@ function App() {
             sx={{ display: "flex", flexWrap: "wrap", mt: 10, mb: 10 }}
           >
             {user ? (
-              <BookCard />
+              <BookCard handleEdit={handleEdit} />
             ) : (
               <div
                 style={{
@@ -75,7 +101,20 @@ function App() {
           </Grid>
         </Container>
       </main>
-      <Form open={open} handleClose={() => setOpen(false)} />
+      <Form
+        open={open}
+        handleClose={() => {
+          setOpen(false);
+          setFormData({
+            title: "",
+            author: "",
+            pages: 0,
+            read: false,
+          });
+        }}
+        formData={formData}
+        handleChange={handelChange}
+      />
     </>
   );
 }
