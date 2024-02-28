@@ -84,8 +84,8 @@ export default function Form({
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={() => {
-            formData
-              ? (editBook as (book: TBook) => Promise<void>)(formData as TBook)
+            if(formData?.id){(editBook as (book: TBook) => Promise<void>)(formData as TBook)}
+            else
               : (addBook as (book: TBook) => Promise<void>)(formData! as TBook);
 
             //handleClose();

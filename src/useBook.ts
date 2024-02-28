@@ -43,7 +43,7 @@ export default function useBooks() {
         snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as TBook))
       );
     });
-  });
+  }, []);
 
   const addBook = async (book: TBook) => {
     const { uid } = auth.currentUser!;
@@ -89,6 +89,7 @@ export default function useBooks() {
     }
   };
   const editBook = async (book: TBook) => {
+    console.log("hello edit");
     try {
       const docRef = doc(db, "books", book.id);
       await updateDoc(docRef, {
