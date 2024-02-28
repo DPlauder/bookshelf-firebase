@@ -7,7 +7,7 @@ import { Button, Grid, Container } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import BookCard from "./Books";
 import Form from "./Form";
-import useBooks, { TBook } from "./useBook";
+import { TBook } from "./useBook";
 
 function App() {
   const [open, setOpen] = useState(false);
@@ -23,7 +23,7 @@ function App() {
     boxShadow: "2px 2px 3px gray",
     padding: "3px 5%",
   };
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TBook>({
     title: "",
     author: "",
     pages: 0,
