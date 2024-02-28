@@ -15,12 +15,7 @@ import useBooks, { TBook } from "./useBook";
 interface Props {
   open: boolean;
   handleClose: () => void;
-  formData?: {
-    title: string;
-    author: string;
-    pages: number;
-    read: boolean;
-  };
+  formData?: TBook;
   handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -84,11 +79,12 @@ export default function Form({
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={() => {
-            if(formData?.id){(editBook as (book: TBook) => Promise<void>)(formData as TBook)}
-            else
+            //(addBook as (book: TBook) => void)(formData as TBook);
+            formData?.id
+              ? (editBook as (book: TBook) => Promise<void>)(formData as TBook)
               : (addBook as (book: TBook) => Promise<void>)(formData! as TBook);
 
-            //handleClose();
+            handleClose();
           }}
         >
           Add Book

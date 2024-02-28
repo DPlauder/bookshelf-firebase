@@ -19,23 +19,26 @@ import {
 } from "firebase/storage";
 
 export type TBook = {
-  id: string;
+  id?: string;
   title: string;
   author: string;
   pages: number;
   read: boolean;
-  createdAt: Date;
+  createdAt?: Date;
   imageURL?: string;
   uid?: string;
   storageUri?: string;
 };
 export default function useBooks() {
-  const q = query(collection(db, "books"), orderBy("createdAt", "desc"));
-  onSnapshot(q, (snapshot) => {
-    setBooks(
-      snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as TBook))
-    );
-  });
+  useEffect(() => {
+    const q = query(collection(db, "books"), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      setBooks(
+        snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as TBook))
+      );
+    });
+  }, []);
+
   const [books, setBooks] = useState<TBook[]>([]);
   useEffect(() => {
     onSnapshot(collection(db, "books"), (snapshot) => {
@@ -55,8 +58,9 @@ export default function useBooks() {
       imageURL: "",
     });
   };
+
   const deleteBook = async (book: TBook) => {
-    await deleteDoc(doc(db, "books", book.id));
+    await deleteDoc(doc(db, "books", book.id!));
     if (book.imageURL) {
       const imageRef = ref(storage, book.storageUri);
       await deleteObject(imageRef);
@@ -75,7 +79,7 @@ export default function useBooks() {
       const newImageRef = ref(storage, filepath);
       const uploadTask = await uploadBytesResumable(newImageRef, file);
       const publicImgUrl = await getDownloadURL(uploadTask.ref);
-      const docRef = doc(db, "books", book.id);
+      const docRef = doc(db, "books", book.id!);
       await setDoc(docRef, {
         ...book,
         imageURL: LODING_IMAGE_URL,
@@ -89,9 +93,8 @@ export default function useBooks() {
     }
   };
   const editBook = async (book: TBook) => {
-    console.log("hello edit");
     try {
-      const docRef = doc(db, "books", book.id);
+      const docRef = doc(db, "books", book.id!);
       await updateDoc(docRef, {
         ...book,
       });
