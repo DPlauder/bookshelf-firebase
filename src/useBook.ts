@@ -19,31 +19,34 @@ import {
 } from "firebase/storage";
 
 export type TBook = {
-  id: string;
+  id?: string;
   title: string;
   author: string;
   pages: number;
   read: boolean;
-  createdAt: Date;
+  createdAt?: Date;
   imageURL?: string;
   uid?: string;
   storageUri?: string;
 };
 export default function useBooks() {
-  const q = query(collection(db, "books"), orderBy("createdAt", "desc"));
-  onSnapshot(q, (snapshot) => {
-    setBooks(
-      snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as TBook))
-    );
-  });
-  const [books, setBooks] = useState<TBook[]>([]);
   useEffect(() => {
+    const q = query(collection(db, "books"), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      setBooks(
+        snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as TBook))
+      );
+    });
+  }, []);
+
+  const [books, setBooks] = useState<TBook[]>([]);
+  /*  useEffect(() => {
     onSnapshot(collection(db, "books"), (snapshot) => {
       setBooks(
         snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as TBook))
       );
     });
-  });
+  }); */
 
   const addBook = async (book: TBook) => {
     const { uid } = auth.currentUser!;
@@ -55,6 +58,7 @@ export default function useBooks() {
       imageURL: "",
     });
   };
+
   const deleteBook = async (book: TBook) => {
     await deleteDoc(doc(db, "books", book.id));
     if (book.imageURL) {
